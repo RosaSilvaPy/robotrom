@@ -1,5 +1,6 @@
 const buttons = document.querySelectorAll("[data-controle]");
 const statistics  = document.querySelectorAll("[data-estatistica]");
+const btnReload = document.querySelector('#producao');
 
 
 const parts = {
@@ -39,10 +40,18 @@ const parts = {
 
 // Utilizando foreach javascript
 buttons.forEach( (btn)=>{
+    var componentValue = 0;
     btn.addEventListener('click', (event)=>{
-        equalizeRobotrom(event.target.dataset.controle, event.target.parentNode);
-        updateStats(event.target.dataset.controle, event.target.dataset.peca);
+        componentValue = equalizeRobotrom(event.target.dataset.controle, event.target.parentNode);
+
+        //Três parametros: sinal + ou -  ,  componente/peça  , valor atual da peça
+        updateStats(event.target.dataset.controle, event.target.dataset.peca, componentValue);
     });
+});
+
+
+btnReload.addEventListener('click', ()=>{
+    location.reload();
 });
 
 
@@ -56,17 +65,19 @@ function equalizeRobotrom(operator, parent){
     }else if(operator === '+'){
         comp.value = controlValue + 1;
     }
+    //Retorna o valor atual da peça para: se "0" bloquea o decremnto da estatistica.
+    return parseInt(comp.value);
 }
 
-function  updateStats(operator, part){
+function  updateStats(operator, part, componentValue){
+    //else if(componentValue > 0) Se a peça tiver o valor "0", clicando não pode alterar a estatistica.
     statistics.forEach((element)=>{
         if(operator === '+'){
             element.textContent = parseInt(element.textContent) + parts[part][element.dataset.estatistica];
-        }else{
+        }else if(componentValue > 0){
             element.textContent = parseInt(element.textContent) - parts[part][element.dataset.estatistica];
         }
     });
     
 }
-    
-
+   
